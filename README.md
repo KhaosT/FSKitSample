@@ -1,4 +1,4 @@
-# FSKit
+# FSKit Sample
 
 FSKit is the new framework introduced in macOS Sequoia that enables the developer to provide custom filesystem support from user space. The document is almost non-existent at the moment so here is a sample project to show how to use the framework.
 
