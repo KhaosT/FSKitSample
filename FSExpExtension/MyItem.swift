@@ -21,11 +21,15 @@ final class MyItem: FSUnaryItem {
     
     var attributes = FSItemAttributes()
     var xattrs: [String: Data] = [:]
+    var data: Data?
     
     private(set) var children: [String: MyItem] = [:]
     
     init(name: String) {
         self.name = name
+        attributes.fileid = id
+        attributes.size = 0
+        attributes.allocSize = 0
     }
     
     func addItem(_ item: MyItem) {

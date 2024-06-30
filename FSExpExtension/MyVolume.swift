@@ -13,7 +13,7 @@ final class MyVolume: FSVolume, FSVolumeOperations {
     private let root: MyItem = {
         let item = MyItem(name: "/")
         item.attributes.type = .dir
-        item.attributes.mode = 0b111_111_111_111
+        item.attributes.mode = 0b111_111_111
         return item
     }()
     
@@ -155,6 +155,7 @@ final class MyVolume: FSVolume, FSVolumeOperations {
         let item = MyItem(name: name.string ?? "Unknown")
         mergeAttributes(item.attributes, request: newAttributes)
         item.attributes.parentid = directory.id
+        item.attributes.type = type
         directory.addItem(item)
         
         reply(item, nil)
@@ -456,7 +457,18 @@ extension MyVolume: FSVolumeReadWriteOperations {
         replyHandler reply: @escaping (Int, (any Error)?) -> Void
     ) {
         NSLog("🐛 read: \(item)")
-        reply(0, nil)
+        
+        var bytesRead = 0
+        
+        if let item = item as? MyItem, let data = item.data {
+            bytesRead = data.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
+                let length = min(buffer.capacity(), data.count)
+                memcpy(buffer.mutableBytes(), ptr.baseAddress, length)
+                return length
+            }
+        }
+        
+        reply(bytesRead, nil)
     }
     
     func write(
@@ -465,7 +477,15 @@ extension MyVolume: FSVolumeReadWriteOperations {
         buffer: Data,
         replyHandler reply: @escaping (Int, (any Error)?) -> Void
     ) {
-        NSLog("🐛 write: \(item)")
+        NSLog("🐛 write: \(item) - \(offset)")
+        
+        if let item = item as? MyItem {
+            NSLog("🐛 - write: \(item.name)")
+            item.data = buffer
+            item.attributes.size = UInt64(buffer.count)
+            item.attributes.allocSize = UInt64(buffer.count)
+        }
+        
         reply(buffer.count, nil)
     }
 }
