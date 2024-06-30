@@ -13,19 +13,19 @@ final class MyVolume: FSVolume, FSVolumeOperations {
     private let root: MyItem = {
         let item = MyItem(name: "/")
         item.attributes.type = .dir
-        item.attributes.mode = 0b111_111_111
+        item.attributes.mode = 0b111_111_111_111
         return item
     }()
     
     var volumeStatistics: FSKitStatfsResult {
         return FSKitStatfsResult.statFS(
-            withBlockSize: 1,
-            ioSize: 1,
-            totalBlocks: 1,
-            availableBlocks: 0,
-            freeBlocks: 0,
-            totalFiles: 1,
-            freeFiles: 0,
+            withBlockSize: 1024,
+            ioSize: 1024,
+            totalBlocks: 1024,
+            availableBlocks: 1024,
+            freeBlocks: 1024,
+            totalFiles: 100,
+            freeFiles: 100,
             fsSubType: 0,
             fsTypeName: "MyFS"
         )
@@ -154,6 +154,7 @@ final class MyVolume: FSVolume, FSVolumeOperations {
         
         let item = MyItem(name: name.string ?? "Unknown")
         mergeAttributes(item.attributes, request: newAttributes)
+        item.attributes.parentid = directory.id
         directory.addItem(item)
         
         reply(item, nil)
@@ -218,12 +219,14 @@ final class MyVolume: FSVolume, FSVolumeOperations {
         using packer: @escaping FSDirEntryPacker,
         replyHandler reply: @escaping (UInt64, (any Error)?) -> Void
     ) {
-        NSLog("🐛 enumerateDirectory: \(directory)")
+        NSLog("🐛 enumerateDirectory: \(directory) - \(cookie) - \(verifier) - \(provideAttributes)")
 
         guard let directory = directory as? MyItem else {
             reply(0, fs_errorForPOSIXError(POSIXError.ENOENT.rawValue))
             return
         }
+        
+        NSLog("🐛 enumerateDirectory - \(directory.name)")
         
         for (idx, item) in directory.children.values.enumerated() {
             let isLast = (idx == directory.children.count - 1)
@@ -232,15 +235,15 @@ final class MyVolume: FSVolume, FSVolumeOperations {
                 FSFileName(string: item.name),
                 item.attributes.type,
                 item.id,
-                item.id,
-                item.attributes,
+                UInt64(idx),
+                provideAttributes ? item.attributes : nil,
                 isLast
             )
             
-            NSLog("🐛 V: \(v) - isLast: \(isLast)")
+            NSLog("🐛 V: \(v) - \(item.name) - \(item.attributes.type) - \(item.attributes.typeIsActive) - isLast: \(isLast)")
         }
         
-        reply(1, nil)
+        reply(0, nil)
     }
     
     func activate(
@@ -248,6 +251,7 @@ final class MyVolume: FSVolume, FSVolumeOperations {
         replyHandler reply: @escaping (FSItem?, (any Error)?) -> Void
     ) {
         NSLog("🐛 activate: \(options)")
+        volumeState = .active
         reply(
             root,
             nil
@@ -292,77 +296,77 @@ final class MyVolume: FSVolume, FSVolumeOperations {
     }
     
     private func mergeAttributes(_ existing: FSItemAttributes, request: FSItemSetAttributesRequest) {
-        if request.uidWasConsumed {
+        if request.uidIsActive {
             existing.uid = request.uid
         }
         
-        if request.gidWasConsumed {
+        if request.gidIsActive {
             existing.gid = request.gid
         }
         
-        if request.typeWasConsumed {
+        if request.typeIsActive {
             existing.type = request.type
         }
         
-        if request.modeWasConsumed {
+        if request.modeIsActive {
             existing.mode = request.mode
         }
         
-        if request.numLinksWasConsumed {
+        if request.numLinksIsActive {
             existing.numLinks = request.numLinks
         }
         
-        if request.bsdFlagsWasConsumed {
+        if request.bsdFlagsIsActive {
             existing.bsdFlags = request.bsdFlags
         }
         
-        if request.sizeWasConsumed {
+        if request.sizeIsActive {
             existing.size = request.size
         }
         
-        if request.allocSizeWasConsumed {
+        if request.allocSizeIsActive {
             existing.allocSize = request.allocSize
         }
         
-        if request.fileidWasConsumed {
+        if request.fileidIsActive {
             existing.fileid = request.fileid
         }
         
-        if request.parentidWasConsumed {
+        if request.parentidIsActive {
             existing.parentid = request.parentid
         }
         
-        if request.accessTimeWasConsumed {
+        if request.accessTimeIsActive {
             var timespec = timespec()
             request.accessTime(&timespec)
             existing.setAccessTime(&timespec)
         }
         
-        if request.changeTimeWasConsumed {
+        if request.changeTimeIsActive {
             var timespec = timespec()
             request.changeTime(&timespec)
             existing.setChangeTime(&timespec)
         }
         
-        if request.modifyTimeWasConsumed {
+        if request.modifyTimeIsActive {
             var timespec = timespec()
             request.modifyTime(&timespec)
             existing.setModifyTime(&timespec)
         }
         
-        if request.addedTimeWasConsumed {
+        if request.addedTimeIsActive {
             var timespec = timespec()
             request.addedTime(&timespec)
             existing.setAddedTime(&timespec)
         }
         
-        if request.birthTimeWasConsumed {
+        if request.birthTimeIsActive {
             var timespec = timespec()
             request.birthTime(&timespec)
             existing.setBirthTime(&timespec)
         }
         
-        if request.backupTimeWasConsumed {
+        if request.backupTimeIsActive {
             var timespec = timespec()
             request.backupTime(&timespec)
             existing.setBackupTime(&timespec)
@@ -401,24 +405,18 @@ extension MyVolume: FSVolumeOpenCloseOperations {
 
 extension MyVolume: FSVolumeXattrOperations {
     
-    var xattrOperationsInhibited: Bool {
-        get {
-            NSLog("🐛 xattrOperationsInhibited called")
-            return true
-        }
-        
-        set {
-            NSLog("🐛 xattrOperationsInhibited set: \(newValue)")
-        }
-    }
-    
     func xattr(
         of item: FSItem,
         named name: FSFileName,
         replyHandler reply: @escaping (Data?, (any Error)?) -> Void
     ) {
         NSLog("🐛 xattr: \(item)")
-        reply(nil, nil)
+        
+        if let item = item as? MyItem, let key = name.string {
+            reply(item.xattrs[key], nil)
+        } else {
+            reply(nil, nil)
+        }
     }
     
     func setXattrOf(
@@ -429,12 +427,22 @@ extension MyVolume: FSVolumeXattrOperations {
         replyHandler reply: @escaping ((any Error)?) -> Void
     ) {
         NSLog("🐛 setXattrOf: \(item)")
+        
+        if let item = item as? MyItem, let key = name.string {
+            item.xattrs[key] = value
+        }
+        
         reply(nil)
     }
     
     func listXattrs(of item: FSItem, replyHandler reply: @escaping ([String]?, (any Error)?) -> Void) {
         NSLog("🐛 listXattrs: \(item)")
-        reply([], nil)
+        
+        if let item = item as? MyItem {
+            reply(Array(item.xattrs.keys), nil)
+        } else {
+            reply([], nil)
+        }
     }
 }
 

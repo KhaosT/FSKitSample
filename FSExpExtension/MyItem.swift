@@ -20,6 +20,7 @@ final class MyItem: FSUnaryItem {
     let id = MyItem.getNextID()
     
     var attributes = FSItemAttributes()
+    var xattrs: [String: Data] = [:]
     
     private(set) var children: [String: MyItem] = [:]
     

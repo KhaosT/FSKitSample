@@ -22,7 +22,7 @@ final class MyFS: FSUnaryFileSystem, FSUnaryFileSystemOperations, FSManageableRe
     override init() {
         super.init()
         
-        containerState = .ready
+        containerState = .active
         NSLog("🐛 Meow")
     }
     
