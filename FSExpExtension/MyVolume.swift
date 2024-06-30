@@ -13,19 +13,21 @@ final class MyVolume: FSVolume, FSVolumeOperations {
     private let root: MyItem = {
         let item = MyItem(name: "/")
         item.attributes.type = .dir
-        item.attributes.mode = 0b111_111_111
+        item.attributes.mode = 0b111_000_000
+        item.attributes.allocSize = 1
+        item.attributes.size = 1
         return item
     }()
     
     var volumeStatistics: FSKitStatfsResult {
         return FSKitStatfsResult.statFS(
-            withBlockSize: 1024,
-            ioSize: 1024,
-            totalBlocks: 1024,
-            availableBlocks: 1024,
-            freeBlocks: 1024,
-            totalFiles: 100,
-            freeFiles: 100,
+            withBlockSize: 1024000,
+            ioSize: 1024000,
+            totalBlocks: 1024000,
+            availableBlocks: 1024000,
+            freeBlocks: 1024000,
+            totalFiles: 1024000,
+            freeFiles: 1024000,
             fsSubType: 0,
             fsTypeName: "MyFS"
         )
@@ -33,7 +35,10 @@ final class MyVolume: FSVolume, FSVolumeOperations {
     
     override var volumeSupportedCapabilities: FSVolumeSupportedCapabilities {
         let capabilities = FSVolumeSupportedCapabilities()
+        capabilities.supportsPersistentObjectIDs = true
         capabilities.supportsNoVolumeSizes = true
+        capabilities.supportsHiddenFiles = true
+        capabilities.supports64BitObjectIDs = true
         return capabilities
     }
     
@@ -289,7 +294,7 @@ final class MyVolume: FSVolume, FSVolumeOperations {
     }
     
     func pc_XATTR_SIZE_BITS() -> Int32 {
-        return 64
+        return 8 * 1024 * 1024
     }
     
     func pc_FILESIZEBITS() -> Int32 {
@@ -411,7 +416,7 @@ extension MyVolume: FSVolumeXattrOperations {
         named name: FSFileName,
         replyHandler reply: @escaping (Data?, (any Error)?) -> Void
     ) {
-        NSLog("🐛 xattr: \(item)")
+        NSLog("🐛 xattr: \(item) - \(name.string ?? "NA")")
         
         if let item = item as? MyItem, let key = name.string {
             reply(item.xattrs[key], nil)

@@ -30,6 +30,7 @@ final class MyItem: FSUnaryItem {
         attributes.fileid = id
         attributes.size = 0
         attributes.allocSize = 0
+        attributes.bsdFlags = 0
     }
     
     func addItem(_ item: MyItem) {
