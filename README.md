@@ -11,12 +11,14 @@ From there, you can create your own subclass of `FSVolume` to help manage your v
 Once you build and run the app, you should be able to mount the FS with something like these
 
 ```
-sudo mkdir /Volumes/TestVol
-mount -t MyFS myfs:/a /Volumes/TestVol
+mkdir /tmp/TestVol
+mount -F -t MyFS myfs:/a /tmp/TestVol
 ```
+
+(On macOS Sequoia beta 4, it seems the probing step is broken thus the mount will fail.)
 
 And unmount them with
 
 ```
-sudo umount /Volumes/TestVol
+umount /tmp/TestVol
 ```

@@ -12,10 +12,14 @@ import FSKit
 @main
 final class MyFSExtension: UnaryFilesystemExtension {
     
-    let filesystem: MyFS = .shared
+    var filesystem: MyFS {
+        NSLog("🐛 Called filesystems")
+
+        return .shared
+    }
 }
 
-final class MyFS: FSUnaryFileSystem, FSUnaryFileSystemOperations, FSManageableResourceSimpleMaintenanceOps {
+final class MyFS: FSUnaryFileSystem, FSUnaryFileSystemOperations, FSManageableResourceMaintenanceOperations {
     
     static let shared = MyFS()
     
@@ -40,6 +44,32 @@ final class MyFS: FSUnaryFileSystem, FSUnaryFileSystemOperations, FSManageableRe
     
     func didFinishLoading() {
         NSLog("🐛 DidFinishLoading")
+    }
+    
+    func check(
+        withParameters parameters: [String],
+        connection: FSMessageConnection,
+        taskID: UUID,
+        replyHandler reply: @escaping (Progress?, (any Error)?) -> Void
+    ) {
+        NSLog("🐛 Check")
+
+        let progress = Progress(totalUnitCount: 1)
+        progress.completedUnitCount = 1
+        reply(progress, nil)
+    }
+    
+    func format(
+        withParameters parameters: [String],
+        connection: FSMessageConnection,
+        taskID: UUID,
+        replyHandler reply: @escaping (Progress?, (any Error)?) -> Void
+    ) {
+        NSLog("🐛 Format")
+
+        let progress = Progress(totalUnitCount: 1)
+        progress.completedUnitCount = 1
+        reply(progress, nil)
     }
     
     enum FSError: Error {

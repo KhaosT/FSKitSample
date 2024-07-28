@@ -12,8 +12,12 @@ final class MyVolume: FSVolume, FSVolumeOperations {
     
     private let root: MyItem = {
         let item = MyItem(name: "/")
+        item.attributes.parentid = 0
+        item.attributes.uid = 0
+        item.attributes.gid = 0
+        item.attributes.numLinks = 1
         item.attributes.type = .dir
-        item.attributes.mode = 0b111_000_000
+        item.attributes.mode = UInt32(S_IFDIR | 0b111_000_000)
         item.attributes.allocSize = 1
         item.attributes.size = 1
         return item
@@ -35,6 +39,8 @@ final class MyVolume: FSVolume, FSVolumeOperations {
     
     override var volumeSupportedCapabilities: FSVolumeSupportedCapabilities {
         let capabilities = FSVolumeSupportedCapabilities()
+        capabilities.supportsHardLinks = true
+        capabilities.supportsSymLinks = true
         capabilities.supportsPersistentObjectIDs = true
         capabilities.supportsNoVolumeSizes = true
         capabilities.supportsHiddenFiles = true
@@ -468,7 +474,9 @@ extension MyVolume: FSVolumeReadWriteOperations {
         if let item = item as? MyItem, let data = item.data {
             bytesRead = data.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
                 let length = min(buffer.capacity(), data.count)
-                memcpy(buffer.mutableBytes(), ptr.baseAddress, length)
+                buffer.withMutableBytes { dst in
+                    memcpy(dst, ptr.baseAddress, length)
+                }
                 return length
             }
         }

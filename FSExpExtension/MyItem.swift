@@ -31,6 +31,14 @@ final class MyItem: FSUnaryItem {
         attributes.size = 0
         attributes.allocSize = 0
         attributes.bsdFlags = 0
+        
+        var timespec = timespec()
+        timespec_get(&timespec, TIME_UTC)
+        
+        attributes.setAddedTime(&timespec)
+        attributes.setBirthTime(&timespec)
+        attributes.setChangeTime(&timespec)
+        attributes.setModifyTime(&timespec)
     }
     
     func addItem(_ item: MyItem) {
