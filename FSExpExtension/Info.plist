@@ -10,9 +10,9 @@
 			<string>u:g:m:o:</string>
 		</dict>
 		<key>FSSupportsBlockResources</key>
-		<false/>
-		<key>FSSupportsPathURLs</key>
 		<true/>
+		<key>FSSupportsPathURLs</key>
+		<false/>
 		<key>EXExtensionPointIdentifier</key>
 		<string>com.apple.fskit.fsmodule</string>
 		<key>EXExtensionPrincipalClass</key>

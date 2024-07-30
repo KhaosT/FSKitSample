@@ -8,14 +8,12 @@ The filesystem should be a subclass of `FSUnaryFileSystem` and conforms to neces
 
 From there, you can create your own subclass of `FSVolume` to help manage your volume and conform to `FSVolumeOperations` to support the basic volume specific operations. For a fully functional volume implementation, you’ll probably need to conform to most of the `FSVolume*Operations`.
 
-Once you build and run the app, you should be able to mount the FS with something like these
+Once you build and run the app, you should be able to mount the FS with something like these (`disk18` is a block device)
 
 ```
 mkdir /tmp/TestVol
-mount -F -t MyFS myfs:/a /tmp/TestVol
+mount -F -t MyFS disk18 /tmp/TestVol
 ```
-
-(On macOS Sequoia beta 4, it seems the probing step is broken thus the mount will fail.)
 
 And unmount them with
 
