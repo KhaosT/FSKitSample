@@ -8,234 +8,219 @@
 import FSKit
 import os
 
-final class MyVolume: FSVolume, FSVolumeOperations {
+final class MyVolume: FSVolume {
+    init() {
+        super.init(
+            volumeID: FSVolume.Identifier(
+                uuid: UUID(uuidString: "BC74BFE1-3ADA-4489-A4F2-B432A08DD00B")!
+            ),
+            volumeName: FSFileName(string: "TestV1")
+        )
+    }
     
     private let root: MyItem = {
-        let item = MyItem(name: "/")
-        item.attributes.parentid = 0
+        let item = MyItem(name: FSFileName(string: "/"))
+        item.attributes.parentID = 0
         item.attributes.uid = 0
         item.attributes.gid = 0
-        item.attributes.numLinks = 1
-        item.attributes.type = .dir
+        item.attributes.linkCount = 1
+        item.attributes.type = .directory
         item.attributes.mode = UInt32(S_IFDIR | 0b111_000_000)
         item.attributes.allocSize = 1
         item.attributes.size = 1
         return item
     }()
-    
-    var volumeStatistics: FSKitStatfsResult {
-        return FSKitStatfsResult.statFS(
-            withBlockSize: 1024000,
-            ioSize: 1024000,
-            totalBlocks: 1024000,
-            availableBlocks: 1024000,
-            freeBlocks: 1024000,
-            totalFiles: 1024000,
-            freeFiles: 1024000,
-            fsSubType: 0,
-            fsTypeName: "MyFS"
-        )
+}
+
+extension MyVolume: FSVolume.PathConfOperations {
+    var maxLinkCount: Int32 {
+        .max
     }
-    
-    override var volumeSupportedCapabilities: FSVolumeSupportedCapabilities {
-        let capabilities = FSVolumeSupportedCapabilities()
+
+    var maxNameLength: Int32 {
+        .max
+    }
+
+    var isChownRestricted: Bool {
+        false
+    }
+
+    var isLongNameTruncated: Bool {
+        false
+    }
+
+    var maxXattrSizeInBits: Int32 {
+        .max
+    }
+
+    var maxFileSizeInBits: Int32 {
+        .max
+    }
+}
+
+extension MyVolume: FSVolume.Operations {
+
+    var volumeStatistics: FSStatFSResult {
+        let result = FSStatFSResult(fsTypeName: "MyFS")
+        result.blockSize = 1024000
+        result.ioSize = 1024000
+        result.totalBlocks = 1024000
+        result.availableBlocks = 1024000
+        result.freeBlocks = 1024000
+        result.totalFiles = 1024000
+        result.freeFiles = 1024000
+        result.filesystemSubType = 0
+        return result
+    }
+
+    var supportedVolumeCapabilities: FSVolume.SupportedCapabilities {
+        let capabilities = FSVolume.SupportedCapabilities()
         capabilities.supportsHardLinks = true
-        capabilities.supportsSymLinks = true
+        capabilities.supportsSymbolicLinks = true
         capabilities.supportsPersistentObjectIDs = true
-        capabilities.supportsNoVolumeSizes = true
+        capabilities.doesNotSupportVolumeSizes = true
         capabilities.supportsHiddenFiles = true
         capabilities.supports64BitObjectIDs = true
         return capabilities
     }
-    
-    override init() {
-        super.init()
-        
-        volumeID = FSVolumeIdentifier(
-            uuid: UUID(uuidString: "BC74BFE1-3ADA-4489-A4F2-B432A08DD00B")!
-        )
-        volumeName = "TestV1"
-        volumeState = .ready
-    }
-    
-    func setNewState(
-        _ wantedState: FSVolumeState,
-        forced: Bool,
-        replyHandler reply: @escaping (FSVolumeState, (any Error)?) -> Void
-    ) {
-        NSLog("🐛 State: \(wantedState)")
-        reply(wantedState, nil)
-    }
-    
-    func mount(
-        _ options: FSTaskOptionsBundle,
-        replyHandler reply: @escaping (FSItem?, (any Error)?) -> Void
-    ) {
+
+    func mount(options: [String]) async throws -> FSItem {
         NSLog("🐛 Mount: \(options)")
-        
-        reply(root, nil)
+
+        return root
+    }
+
+    func unmountWithReplyHandler() async {
+        NSLog("🐛 unmountWithReplyHandler")
+    }
+
+    func unmount() async throws {
+        NSLog("🐛 unmount")
     }
     
-    func unmount(_ reply: @escaping () -> Void) {
-        NSLog("🐛 Unmount")
-        reply()
+    func synchronizeWithReplyHandler() async throws {
+        NSLog("🐛 synchronizeWithReplyHandler")
     }
-    
-    func synchronize(_ reply: @escaping ((any Error)?) -> Void) {
+
+    func synchronize() async throws {
         NSLog("🐛 synchronize")
-        reply(nil)
     }
     
-    func getItemAttributes(
-        _ item: FSItem,
-        requestedAttributes desired: FSItemGetAttributesRequest,
-        replyHandler reply: @escaping (FSItemAttributes?, (any Error)?) -> Void
-    ) {
+    func getAttributes(_ desiredAttributes: FSItemGetAttributesRequest, of item: FSItem) async throws -> FSItemAttributes {
         if let item = item as? MyItem {
-            NSLog("🐛 getItemAttributes1: \(item.name), \(desired)")
-            reply(item.attributes, nil)
+            NSLog("🐛 getItemAttributes1: \(item.name), \(desiredAttributes)")
+            return item.attributes
         } else {
-            NSLog("🐛 getItemAttributes2: \(item), \(desired)")
-            reply(nil, fs_errorForPOSIXError(POSIXError.EIO.rawValue))
+            NSLog("🐛 getItemAttributes2: \(item), \(desiredAttributes)")
+            throw fs_errorForPOSIXError(POSIXError.EIO.rawValue)
         }
     }
-    
-    func setItemAttributes(
-        _ item: FSItem,
-        requestedAttributes newAttributes: FSItemSetAttributesRequest,
-        replyHandler reply: @escaping (FSItemAttributes?, (any Error)?) -> Void
-    ) {
+
+    func setAttributes(_ newAttributes: FSItemSetAttributesRequest, on item: FSItem) async throws -> FSItemAttributes {
         NSLog("🐛 setItemAttributes: \(item), \(newAttributes)")
         if let item = item as? MyItem {
             mergeAttributes(item.attributes, request: newAttributes)
-            reply(item.attributes, nil)
+            return item.attributes
         } else {
-            reply(nil, fs_errorForPOSIXError(POSIXError.EIO.rawValue))
+            throw fs_errorForPOSIXError(POSIXError.EIO.rawValue)
         }
     }
     
-    func lookupName(
-        _ name: FSFileName,
-        inDirectory directory: FSItem,
-        replyHandler reply: @escaping (FSItem?, (any Error)?) -> Void
-    ) {
+    func lookupItem(named name: FSFileName, inDirectory directory: FSItem) async throws -> (FSItem, FSFileName) {
         NSLog("🐛 lookupName: \(String(describing: name.string)), \(directory)")
         
         guard let directory = directory as? MyItem else {
-            reply(nil, fs_errorForPOSIXError(POSIXError.ENOENT.rawValue))
-            return
+            throw fs_errorForPOSIXError(POSIXError.ENOENT.rawValue)
         }
         
-        if let name = name.string, let item = directory.children[name] {
-            reply(item, nil)
+        if let item = directory.children[name] {
+            return (item, name)
         } else {
-            reply(nil, fs_errorForPOSIXError(POSIXError.ENOENT.rawValue))
+            throw fs_errorForPOSIXError(POSIXError.ENOENT.rawValue)
         }
     }
-    
-    func reclaim(
-        _ item: FSItem,
-        replyHandler reply: @escaping ((any Error)?) -> Void
-    ) {
+
+    func reclaim(item: FSItem) async throws {
         NSLog("🐛 reclaim: \(item)")
-        reply(nil)
     }
     
-    func readSymbolicLink(
-        _ item: FSItem,
-        replyHandler reply: @escaping (FSFileName?, (any Error)?) -> Void
-    ) {
+    func readSymbolicLink(_ item: FSItem) async throws -> FSFileName {
         NSLog("🐛 readSymbolicLink: \(item)")
-        reply(nil, fs_errorForPOSIXError(POSIXError.EIO.rawValue))
+        throw fs_errorForPOSIXError(POSIXError.EIO.rawValue)
     }
     
-    func createItemNamed(
-        _ name: FSFileName,
+    func createItem(
+        named name: FSFileName,
         type: FSItemType,
         inDirectory directory: FSItem,
-        attributes newAttributes: FSItemSetAttributesRequest,
-        replyHandler reply: @escaping (FSItem?, (any Error)?) -> Void
-    ) {
-        NSLog("🐛 createItemNamed: \(String(describing: name.string)) - \(newAttributes.mode)")
+        attributes newAttributes: FSItemSetAttributesRequest
+    ) async throws -> (FSItem, FSFileName) {
+        NSLog("🐛 createItem: \(String(describing: name.string)) - \(newAttributes.mode)")
         
         guard let directory = directory as? MyItem else {
-            reply(nil, fs_errorForPOSIXError(POSIXError.EIO.rawValue))
-            return
+            throw fs_errorForPOSIXError(POSIXError.EIO.rawValue)
         }
         
-        let item = MyItem(name: name.string ?? "Unknown")
+        let item = MyItem(name: name)
         mergeAttributes(item.attributes, request: newAttributes)
-        item.attributes.parentid = directory.id
+        item.attributes.parentID = directory.id
         item.attributes.type = type
         directory.addItem(item)
         
-        reply(item, nil)
+        return (item, name)
     }
     
-    func createSymbolicLinkNamed(
-        _ name: FSFileName,
-        inDirectory directory: FSItem,
-        attributes newAttributes: FSItemSetAttributesRequest,
-        linkContents contents: Data,
-        replyHandler reply: @escaping (FSItem?, (any Error)?) -> Void
-    ) {
-        NSLog("🐛 createSymbolicLinkNamed: \(name)")
-        reply(nil, fs_errorForPOSIXError(POSIXError.EIO.rawValue))
-    }
-    
-    func createLinkof(
-        _ item: FSItem,
+    func createSymbolicLink(
         named name: FSFileName,
         inDirectory directory: FSItem,
-        replyHandler reply: @escaping ((any Error)?) -> Void
-    ) {
-        NSLog("🐛 createLinkof: \(name)")
-        reply(fs_errorForPOSIXError(POSIXError.EIO.rawValue))
+        attributes newAttributes: FSItemSetAttributesRequest,
+        linkContents contents: FSFileName
+    ) async throws -> (FSItem, FSFileName) {
+        NSLog("🐛 createSymbolicLink: \(name)")
+        throw fs_errorForPOSIXError(POSIXError.EIO.rawValue)
+    }
+    
+    func createLink(to item: FSItem, named name: FSFileName, inDirectory directory: FSItem) async throws -> FSFileName {
+        NSLog("🐛 createLink: \(name)")
+        throw fs_errorForPOSIXError(POSIXError.EIO.rawValue)
     }
     
     func remove(
-        _ item: FSItem,
+        item: FSItem,
         named name: FSFileName,
-        fromDirectory directory: FSItem,
-        replyHandler reply: @escaping ((any Error)?) -> Void
-    ) {
+        fromDirectory directory: FSItem
+    ) async throws {
         NSLog("🐛 remove: \(name)")
         if let item = item as? MyItem, let directory = directory as? MyItem {
             directory.removeItem(item)
-            reply(nil)
         } else {
-            reply(fs_errorForPOSIXError(POSIXError.EIO.rawValue))
+            throw fs_errorForPOSIXError(POSIXError.EIO.rawValue)
         }
     }
     
-    func renameItem(
-        _ item: FSItem,
+    func rename(
+        item: FSItem,
         inDirectory sourceDirectory: FSItem,
         named sourceName: FSFileName,
-        toDirectory destinationDirectory: FSItem,
-        newName destinationName: FSFileName,
-        overItem: FSItem?,
-        with options: FSRenameItemOptions = [],
-        replyHandler reply: @escaping ((any Error)?) -> Void
-    ) {
-        NSLog("🐛 renameItem: \(item)")
-        reply(fs_errorForPOSIXError(POSIXError.EIO.rawValue))
+        toNewName destinationName: FSFileName,
+        inDirectory destinationDirectory: FSItem,
+        overItem: FSItem?
+    ) async throws -> FSFileName {
+        NSLog("🐛 rename: \(item)")
+        throw fs_errorForPOSIXError(POSIXError.EIO.rawValue)
     }
     
     func enumerateDirectory(
         _ directory: FSItem,
-        startingAtCookie cookie: UInt64,
-        verifier: UInt64,
-        provideAttributes: Bool,
-        attributes: FSItemGetAttributesRequest?,
-        using packer: @escaping FSDirEntryPacker,
-        replyHandler reply: @escaping (UInt64, (any Error)?) -> Void
-    ) {
-        NSLog("🐛 enumerateDirectory: \(directory) - \(cookie) - \(verifier) - \(provideAttributes)")
+        startingAtCookie cookie: FSDirectoryCookie,
+        verifier: FSDirectoryVerifier,
+        providingAttributes attributes: FSItemGetAttributesRequest?,
+        using packer: @escaping FSDirectoryEntryPacker
+    ) async throws -> FSDirectoryVerifier {
+        NSLog("🐛 enumerateDirectory: \(directory) - \(cookie) - \(verifier) - \(String(describing: attributes))")
 
         guard let directory = directory as? MyItem else {
-            reply(0, fs_errorForPOSIXError(POSIXError.ENOENT.rawValue))
-            return
+            throw fs_errorForPOSIXError(POSIXError.ENOENT.rawValue)
         }
         
         NSLog("🐛 enumerateDirectory - \(directory.name)")
@@ -244,35 +229,27 @@ final class MyVolume: FSVolume, FSVolumeOperations {
             let isLast = (idx == directory.children.count - 1)
             
             let v = packer(
-                FSFileName(string: item.name),
+                item.name,
                 item.attributes.type,
                 item.id,
-                UInt64(idx),
-                provideAttributes ? item.attributes : nil,
+                idx,
+                attributes != nil ? item.attributes : nil,
                 isLast
             )
             
-            NSLog("🐛 V: \(v) - \(item.name) - \(item.attributes.type) - \(item.attributes.typeIsActive) - isLast: \(isLast)")
+            NSLog("🐛 V: \(v) - \(item.name) - \(item.attributes.type) - isLast: \(isLast)")
         }
-        
-        reply(0, nil)
+
+        return 0
     }
     
-    func activate(
-        _ options: FSTaskOptionsBundle,
-        replyHandler reply: @escaping (FSItem?, (any Error)?) -> Void
-    ) {
+    func activate(options: [String]) async throws -> FSItem {
         NSLog("🐛 activate: \(options)")
-        volumeState = .active
-        reply(
-            root,
-            nil
-        )
+        return root
     }
-    
-    func deactivate(_ options: Int, replyHandler reply: @escaping ((any Error)?) -> Void) {
+
+    func deactivate(options: FSDeactivateOptions = []) async throws {
         NSLog("🐛 deactivate: \(options)")
-        reply(nil)
     }
     
     func pc_LINK_MAX() -> Int32 {
@@ -308,197 +285,168 @@ final class MyVolume: FSVolume, FSVolumeOperations {
     }
     
     private func mergeAttributes(_ existing: FSItemAttributes, request: FSItemSetAttributesRequest) {
-        if request.uidIsActive {
+        if request.isValid(FSItemAttribute.UID) {
             existing.uid = request.uid
         }
         
-        if request.gidIsActive {
+        if request.isValid(FSItemAttribute.GID) {
             existing.gid = request.gid
         }
         
-        if request.typeIsActive {
+        if request.isValid(FSItemAttribute.type) {
             existing.type = request.type
         }
         
-        if request.modeIsActive {
+        if request.isValid(FSItemAttribute.mode) {
             existing.mode = request.mode
         }
         
-        if request.numLinksIsActive {
-            existing.numLinks = request.numLinks
+        if request.isValid(FSItemAttribute.linkCount) {
+            existing.linkCount = request.linkCount
         }
         
-        if request.bsdFlagsIsActive {
-            existing.bsdFlags = request.bsdFlags
+        if request.isValid(FSItemAttribute.flags) {
+            existing.flags = request.flags
         }
         
-        if request.sizeIsActive {
+        if request.isValid(FSItemAttribute.size) {
             existing.size = request.size
         }
         
-        if request.allocSizeIsActive {
+        if request.isValid(FSItemAttribute.allocSize) {
             existing.allocSize = request.allocSize
         }
         
-        if request.fileidIsActive {
-            existing.fileid = request.fileid
+        if request.isValid(FSItemAttribute.fileID) {
+            existing.fileID = request.fileID
+        }
+
+        if request.isValid(FSItemAttribute.parentID) {
+            existing.parentID = request.parentID
+        }
+
+        if request.isValid(FSItemAttribute.accessTime) {
+            let timespec = timespec()
+            request.accessTime = timespec
+            existing.accessTime = timespec
         }
         
-        if request.parentidIsActive {
-            existing.parentid = request.parentid
+        if request.isValid(FSItemAttribute.changeTime) {
+            let timespec = timespec()
+            request.changeTime = timespec
+            existing.changeTime = timespec
         }
         
-        if request.accessTimeIsActive {
-            var timespec = timespec()
-            request.accessTime(&timespec)
-            existing.setAccessTime(&timespec)
+        if request.isValid(FSItemAttribute.modifyTime) {
+            let timespec = timespec()
+            request.modifyTime = timespec
+            existing.modifyTime = timespec
         }
         
-        if request.changeTimeIsActive {
-            var timespec = timespec()
-            request.changeTime(&timespec)
-            existing.setChangeTime(&timespec)
+        if request.isValid(FSItemAttribute.addedTime) {
+            let timespec = timespec()
+            request.addedTime = timespec
+            existing.addedTime = timespec
         }
         
-        if request.modifyTimeIsActive {
-            var timespec = timespec()
-            request.modifyTime(&timespec)
-            existing.setModifyTime(&timespec)
+        if request.isValid(FSItemAttribute.birthTime) {
+            let timespec = timespec()
+            request.birthTime = timespec
+            existing.birthTime = timespec
         }
         
-        if request.addedTimeIsActive {
-            var timespec = timespec()
-            request.addedTime(&timespec)
-            existing.setAddedTime(&timespec)
-        }
-        
-        if request.birthTimeIsActive {
-            var timespec = timespec()
-            request.birthTime(&timespec)
-            existing.setBirthTime(&timespec)
-        }
-        
-        if request.backupTimeIsActive {
-            var timespec = timespec()
-            request.backupTime(&timespec)
-            existing.setBackupTime(&timespec)
+        if request.isValid(FSItemAttribute.backupTime) {
+            let timespec = timespec()
+            request.backupTime = timespec
+            existing.backupTime = timespec
         }
     }
 }
 
-extension MyVolume: FSVolumeOpenCloseOperations {
-    
-    func open(
-        _ item: FSItem,
-        withMode mode: Int32,
-        replyHandler reply: @escaping ((any Error)?) -> Void
-    ) {
+extension MyVolume: FSVolume.OpenCloseOperations {
+    func openItem(_ item: FSItem, modes mode: FSVolume.OpenModes) async throws {
         if let item = item as? MyItem {
             NSLog("🐛 open: \(item.name)")
         } else {
             NSLog("🐛 open: \(item)")
         }
-        reply(nil)
     }
-    
-    func close(
-        _ item: FSItem,
-        keepingMode mode: Int32,
-        replyHandler reply: @escaping ((any Error)?) -> Void
-    ) {
+
+    func close(_ item: FSItem, keeping mode: FSVolume.OpenModes) async throws {
         if let item = item as? MyItem {
             NSLog("🐛 close: \(item.name)")
         } else {
             NSLog("🐛 close: \(item)")
         }
-        reply(nil)
     }
 }
 
-extension MyVolume: FSVolumeXattrOperations {
-    
-    func xattr(
-        of item: FSItem,
-        named name: FSFileName,
-        replyHandler reply: @escaping (Data?, (any Error)?) -> Void
-    ) {
+extension MyVolume: FSVolume.XattrOperations {
+    func xattr(named name: FSFileName, ofItem item: FSItem) async throws -> Data {
         NSLog("🐛 xattr: \(item) - \(name.string ?? "NA")")
         
-        if let item = item as? MyItem, let key = name.string {
-            reply(item.xattrs[key], nil)
+        if let item = item as? MyItem {
+            return item.xattrs[name] ?? Data()
         } else {
-            reply(nil, nil)
+            return Data()
         }
     }
     
-    func setXattrOf(
-        _ item: FSItem,
-        named name: FSFileName,
-        value: Data?,
-        how: FSKitXattrCreateRequirementAndFlags,
-        replyHandler reply: @escaping ((any Error)?) -> Void
-    ) {
+    func setXattr(named name: FSFileName, toData value: Data?, onItem item: FSItem, policy: FSVolume.SetXattrPolicy) async throws {
         NSLog("🐛 setXattrOf: \(item)")
         
-        if let item = item as? MyItem, let key = name.string {
-            item.xattrs[key] = value
+        if let item = item as? MyItem {
+            item.xattrs[name] = value
         }
-        
-        reply(nil)
     }
     
-    func listXattrs(of item: FSItem, replyHandler reply: @escaping ([String]?, (any Error)?) -> Void) {
+    func listXattrs(of item: FSItem) async throws -> [FSFileName] {
         NSLog("🐛 listXattrs: \(item)")
         
         if let item = item as? MyItem {
-            reply(Array(item.xattrs.keys), nil)
+            return Array(item.xattrs.keys)
         } else {
-            reply([], nil)
+            return []
         }
     }
 }
 
-extension MyVolume: FSVolumeReadWriteOperations {
-    
+extension MyVolume: FSVolume.ReadWriteOperations {
     func read(
         fromFile item: FSItem,
         offset: UInt64,
         length: Int,
-        buffer: FSMutableFileDataBuffer,
-        replyHandler reply: @escaping (Int, (any Error)?) -> Void
-    ) {
+        intoBuffer buffer: NSMutableData
+    ) async throws -> Int {
         NSLog("🐛 read: \(item)")
         
         var bytesRead = 0
         
         if let item = item as? MyItem, let data = item.data {
             bytesRead = data.withUnsafeBytes { (ptr: UnsafeRawBufferPointer) in
-                let length = min(buffer.capacity(), data.count)
-                buffer.withMutableBytes { dst in
-                    memcpy(dst, ptr.baseAddress, length)
-                }
+                let length = min(buffer.length, data.count)
+                memcpy(buffer.mutableBytes, ptr.baseAddress, length)
                 return length
             }
         }
         
-        reply(bytesRead, nil)
+        return bytesRead
     }
     
-    func write(
+    func writeContents(
+        _ contents: Data,
         toFile item: FSItem,
-        offset: UInt64,
-        buffer: Data,
-        replyHandler reply: @escaping (Int, (any Error)?) -> Void
-    ) {
+        atOffset offset: UInt64
+    ) async throws -> Int {
         NSLog("🐛 write: \(item) - \(offset)")
         
         if let item = item as? MyItem {
             NSLog("🐛 - write: \(item.name)")
-            item.data = buffer
-            item.attributes.size = UInt64(buffer.count)
-            item.attributes.allocSize = UInt64(buffer.count)
+            item.data = contents
+            item.attributes.size = UInt64(contents.count)
+            item.attributes.allocSize = UInt64(contents.count)
         }
         
-        reply(buffer.count, nil)
+        return contents.count
     }
 }
