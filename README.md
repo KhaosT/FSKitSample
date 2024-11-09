@@ -1,5 +1,7 @@
 # FSKit Sample
 
+⚠️ Apple removed FSKit from the released SDK, and continues to make changes to the API definition... Right now the project no longer works on the latest macOS Sequoia. I'll update it after FSKit team figure out what they are doing...
+
 FSKit is the new framework introduced in macOS Sequoia that enables the developer to provide custom filesystem support from user space. The document is almost non-existent at the moment so here is a sample project to show how to use the framework.
 
 `UnaryFilesystemExtension` is the entry point of your custom filesystem. The implementation should return an instance of your custom filesystem implementation.
