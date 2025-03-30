@@ -19,7 +19,7 @@ struct ContentView: View {
                     Text(module.bundleIdentifier)
                         .bold()
                     Text(module.url.absoluteString)
-                    Text(module.attributes.description)
+                    Text("\(module.isEnabled)")
                 }
             }
         }
