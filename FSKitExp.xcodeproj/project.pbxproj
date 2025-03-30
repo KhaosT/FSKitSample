@@ -7,26 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		CC638BC82C2E81CC00FB774D /* MyVolume.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC638BC72C2E81C700FB774D /* MyVolume.swift */; };
-		CC638BCA2C2E853100FB774D /* MyItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC638BC92C2E852F00FB774D /* MyItem.swift */; };
 		CCF967F02C1C110D00FBE72D /* FSKitExpApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCF967EF2C1C110D00FBE72D /* FSKitExpApp.swift */; };
 		CCF967F22C1C110D00FBE72D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCF967F12C1C110D00FBE72D /* ContentView.swift */; };
 		CCF967F42C1C110E00FBE72D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CCF967F32C1C110E00FBE72D /* Assets.xcassets */; };
 		CCF967F72C1C110E00FBE72D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CCF967F62C1C110E00FBE72D /* Preview Assets.xcassets */; };
-		CCF968212C1C113500FBE72D /* FSExpExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCF968202C1C113500FBE72D /* FSExpExtension.swift */; };
-		CCF968262C1C113500FBE72D /* FSExpExtension.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = CCF9681E2C1C113500FBE72D /* FSExpExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CCF9682C2C1C13B300FBE72D /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCF9682B2C1C13AF00FBE72D /* ViewModel.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		CCF968242C1C113500FBE72D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = CCF967E42C1C110D00FBE72D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = CCF9681D2C1C113500FBE72D;
-			remoteInfo = FSExpExtension;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		CCF9682A2C1C113500FBE72D /* Embed ExtensionKit Extensions */ = {
@@ -35,7 +21,6 @@
 			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
 			dstSubfolderSpec = 16;
 			files = (
-				CCF968262C1C113500FBE72D /* FSExpExtension.appex in Embed ExtensionKit Extensions */,
 			);
 			name = "Embed ExtensionKit Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -43,31 +28,18 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		CC638BC72C2E81C700FB774D /* MyVolume.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyVolume.swift; sourceTree = "<group>"; };
-		CC638BC92C2E852F00FB774D /* MyItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyItem.swift; sourceTree = "<group>"; };
 		CCF967EC2C1C110D00FBE72D /* FSKitExp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FSKitExp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CCF967EF2C1C110D00FBE72D /* FSKitExpApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FSKitExpApp.swift; sourceTree = "<group>"; };
 		CCF967F12C1C110D00FBE72D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		CCF967F32C1C110E00FBE72D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CCF967F62C1C110E00FBE72D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		CCF967F82C1C110E00FBE72D /* FSKitExp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FSKitExp.entitlements; sourceTree = "<group>"; };
-		CCF9681E2C1C113500FBE72D /* FSExpExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = FSExpExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		CCF968202C1C113500FBE72D /* FSExpExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FSExpExtension.swift; sourceTree = "<group>"; };
-		CCF968222C1C113500FBE72D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		CCF968232C1C113500FBE72D /* FSExpExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FSExpExtension.entitlements; sourceTree = "<group>"; };
 		CCF9682B2C1C13AF00FBE72D /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		CCF9682D2C1C14AE00FBE72D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		CCF967E92C1C110D00FBE72D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		CCF9681B2C1C113500FBE72D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -81,7 +53,6 @@
 			isa = PBXGroup;
 			children = (
 				CCF967EE2C1C110D00FBE72D /* FSKitExp */,
-				CCF9681F2C1C113500FBE72D /* FSExpExtension */,
 				CCF967ED2C1C110D00FBE72D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,7 +61,6 @@
 			isa = PBXGroup;
 			children = (
 				CCF967EC2C1C110D00FBE72D /* FSKitExp.app */,
-				CCF9681E2C1C113500FBE72D /* FSExpExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -117,18 +87,6 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		CCF9681F2C1C113500FBE72D /* FSExpExtension */ = {
-			isa = PBXGroup;
-			children = (
-				CCF968202C1C113500FBE72D /* FSExpExtension.swift */,
-				CC638BC72C2E81C700FB774D /* MyVolume.swift */,
-				CC638BC92C2E852F00FB774D /* MyItem.swift */,
-				CCF968222C1C113500FBE72D /* Info.plist */,
-				CCF968232C1C113500FBE72D /* FSExpExtension.entitlements */,
-			);
-			path = FSExpExtension;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -144,29 +102,11 @@
 			buildRules = (
 			);
 			dependencies = (
-				CCF968252C1C113500FBE72D /* PBXTargetDependency */,
 			);
 			name = FSKitExp;
 			productName = FSKitExp;
 			productReference = CCF967EC2C1C110D00FBE72D /* FSKitExp.app */;
 			productType = "com.apple.product-type.application";
-		};
-		CCF9681D2C1C113500FBE72D /* FSExpExtension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = CCF968272C1C113500FBE72D /* Build configuration list for PBXNativeTarget "FSExpExtension" */;
-			buildPhases = (
-				CCF9681A2C1C113500FBE72D /* Sources */,
-				CCF9681B2C1C113500FBE72D /* Frameworks */,
-				CCF9681C2C1C113500FBE72D /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = FSExpExtension;
-			productName = FSExpExtension;
-			productReference = CCF9681E2C1C113500FBE72D /* FSExpExtension.appex */;
-			productType = "com.apple.product-type.extensionkit-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -179,9 +119,6 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					CCF967EB2C1C110D00FBE72D = {
-						CreatedOnToolsVersion = 16.0;
-					};
-					CCF9681D2C1C113500FBE72D = {
 						CreatedOnToolsVersion = 16.0;
 					};
 				};
@@ -200,7 +137,6 @@
 			projectRoot = "";
 			targets = (
 				CCF967EB2C1C110D00FBE72D /* FSKitExp */,
-				CCF9681D2C1C113500FBE72D /* FSExpExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -212,13 +148,6 @@
 			files = (
 				CCF967F72C1C110E00FBE72D /* Preview Assets.xcassets in Resources */,
 				CCF967F42C1C110E00FBE72D /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		CCF9681C2C1C113500FBE72D /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,25 +164,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CCF9681A2C1C113500FBE72D /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				CCF968212C1C113500FBE72D /* FSExpExtension.swift in Sources */,
-				CC638BCA2C2E853100FB774D /* MyItem.swift in Sources */,
-				CC638BC82C2E81CC00FB774D /* MyVolume.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		CCF968252C1C113500FBE72D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = CCF9681D2C1C113500FBE72D /* FSExpExtension */;
-			targetProxy = CCF968242C1C113500FBE72D /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		CCF9680F2C1C110E00FBE72D /* Debug */ = {
@@ -394,6 +305,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.cerio.FSKitExp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -422,61 +334,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.cerio.FSKitExp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
-		CCF968282C1C113500FBE72D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = FSExpExtension/FSExpExtension.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PP4C5TR737;
-				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = FSExpExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = FSExpExtension;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@executable_path/../../../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.cerio.FSKitExp.FSExpExtension;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		CCF968292C1C113500FBE72D /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = FSExpExtension/FSExpExtension.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PP4C5TR737;
-				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = FSExpExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = FSExpExtension;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@executable_path/../../../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.cerio.FSKitExp.FSExpExtension;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -499,15 +360,6 @@
 			buildConfigurations = (
 				CCF968122C1C110E00FBE72D /* Debug */,
 				CCF968132C1C110E00FBE72D /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		CCF968272C1C113500FBE72D /* Build configuration list for PBXNativeTarget "FSExpExtension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				CCF968282C1C113500FBE72D /* Debug */,
-				CCF968292C1C113500FBE72D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
