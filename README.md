@@ -10,7 +10,7 @@ The filesystem should be a subclass of `FSUnaryFileSystem` and conforms to neces
 
 From there, you can create your own subclass of `FSVolume` to help manage your volume and conform to `FSVolume.Operations` to support the basic volume specific operations. For a fully functional volume implementation, you’ll probably need to conform to most of the `FSVolume.*Operations`.
 
-As of macOS 15.4, the OS will not load the custom FS extensions by default, and you have to manually add the bundle identifier to `~/Library/Group Containers/group.com.apple.fskit.settings/enabledModules.plist`. There suppose to have a way to enable the extension but I'm unable to find it since there is pretty much ZERO documentation around actually how to interact with this framework 🙃.
+As of macOS 15.4, the OS will not load the custom FS extensions by default, and you have to manually add the bundle identifier to `~/Library/Group Containers/group.com.apple.fskit.settings/enabledModules.plist` (Without that trying to mount a FS we get the error `fskitd	-[fskitdXPCServer applyResource:targetBundle:instanceID:initiatorAuditToken:authorizingAuditToken:isProbe:usingBlock:]: Attempt to start disabled extension ...`). I assume there suppose to have a way to enable the extension but I'm unable to find it since there is pretty much ZERO documentation around actually how to interact with this framework 🙃.
 
 Once you build and run the app, you should be able to mount the FS with something like these (`disk18` is a block device)
 
